@@ -13,7 +13,10 @@ static MIN_FRAME_DELAY: int = 1
 
 cpp fn getNextFrame(base: *unsafe, nextOffset: int): *unsafe
 fn getNextOffset(base: *unsafe, nextOffset: int): *unsafe {
-	ret cpp.getNextFrame(base, nextOffset)
+    //using C++
+    //ret cpp.getNextFrame(base, nextOffset)
+    //using pure Jule
+	ret unsafe { (*byte)(base) + nextOffset }
 }
 
 fn main() {
@@ -23,7 +26,7 @@ fn main() {
 	let animFrames: i32 = 0
 
 	raylib::InitWindow(screenWidth, screenHeight, "raylib [textures] example - gif playing")
-	let imgAni = raylib::LoadImageAnim("resources/scarfy_run.gif", &animFrames)
+	let imgAni = raylib::LoadImageAnim("../resources/scarfy_run.gif", &animFrames)
 	let textAni = raylib::LoadTextureFromImage(imgAni)
 	let mut nextFrameDataOffset = 0
 	let mut currentAnimFrame = 0
