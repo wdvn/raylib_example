@@ -1,0 +1,100 @@
+#pass "-I../../raylib/include -L../../raylib/lib -lraylib -lGL -lX11 -lpthread -lm -ldl -Wl,-rpath,../../raylib/lib"
+
+
+// clone raylib from https://github.com/wdvn/raylib
+use "../../raylib"
+use fmt "std/fmt"
+
+cpp use "gif.cpp"
+cpp use "gif.hpp"
+
+static MAX_FRAME_DELAY: int = 15
+static MIN_FRAME_DELAY: int = 1
+
+cpp fn getNextFrame(base: *unsafe, nextOffset: int): *unsafe
+fn getNextOffset(base: *unsafe, nextOffset: int): *unsafe {
+	ret cpp.getNextFrame(base, nextOffset)
+}
+
+fn main() {
+	let screenWidth = 1280
+	let screenHeight = 720
+
+	let animFrames: i32 = 0
+
+	raylib::InitWindow(screenWidth, screenHeight, "raylib [textures] example - gif playing")
+	let imgAni = raylib::LoadImageAnim("resources/scarfy_run.gif", &animFrames)
+	let textAni = raylib::LoadTextureFromImage(imgAni)
+	let mut nextFrameDataOffset = 0
+	let mut currentAnimFrame = 0
+	let mut frameDelay = 8
+	let mut frameCounter = 0
+	raylib::SetTargetFPS(60)
+
+	for !raylib::WindowShouldClose() {
+		frameCounter++
+		if frameCounter >= frameDelay {
+			// Move to next frame
+			// NOTE: If final frame is reached we return to first frame
+			currentAnimFrame++
+			if (currentAnimFrame >= int(animFrames)) {
+				currentAnimFrame = 0
+			}
+
+			// Get memory offset position for next frame data in image.data
+			nextFrameDataOffset = imgAni.width * imgAni.height * 4 * currentAnimFrame
+
+			// Update GPU texture data with next frame image data
+			// WARNING: Data size (frame size) and pixel format must match already created texture
+			// TODO: has an issue with Jule does not have the 'void *' data type
+			let fm = unsafe { (raylib::Void)(getNextOffset(imgAni.data, nextFrameDataOffset)) }
+			raylib::UpdateTexture(textAni, fm)
+
+			frameCounter = 0
+		}
+
+		// Control frames delay
+		if (raylib::IsKeyPressed(raylib::KeyboardKey.KEY_RIGHT)) {
+			frameDelay++
+		} else if (raylib::IsKeyPressed(raylib::KeyboardKey.KEY_LEFT)) {
+			frameDelay--
+		}
+
+		if (frameDelay > MAX_FRAME_DELAY) {
+			frameDelay = MAX_FRAME_DELAY
+		} else if (frameDelay < MIN_FRAME_DELAY) {
+			frameDelay = MIN_FRAME_DELAY
+		}
+
+		// Draw
+		//----------------------------------------------------------------------------------
+		raylib::BeginDrawing()
+
+		raylib::ClearBackground(raylib::RAYWHITE)
+
+		raylib::DrawText(fmt::Format("TOTAL GIF FRAMES:  {}", animFrames), 50, 30, 20, raylib::LIGHTGRAY)
+		raylib::DrawText(fmt::Format("CURRENT FRAME: {}", currentAnimFrame), 50, 60, 20, raylib::GRAY)
+		raylib::DrawText(fmt::Format("CURRENT FRAME IMAGE.DATA OFFSET: {}", nextFrameDataOffset), 50, 90, 20, raylib::GRAY)
+
+		raylib::DrawText("FRAMES DELAY: ", 100, 305, 10, raylib::DARKGRAY)
+		raylib::DrawText(fmt::Format("{} frames", frameDelay), 620, 305, 10, raylib::DARKGRAY)
+		raylib::DrawText("PRESS RIGHT/LEFT KEYS to CHANGE SPEED!", 290, 350, 10, raylib::DARKGRAY)
+
+		let mut i = 0
+		for i < MAX_FRAME_DELAY; i++ {
+			if (i < frameDelay) {
+				raylib::DrawRectangle(190+21*i, 300, 20, 20, raylib::RED)
+			}
+			raylib::DrawRectangleLines(190+21*i, 300, 20, 20, raylib::MAROON)
+		}
+
+		raylib::DrawTexture(textAni, raylib::GetScreenWidth()/2-textAni.width/2, 140, raylib::WHITE)
+
+		raylib::DrawText("(c) Scarfy sprite by Eiden Marsal", screenWidth-200, screenHeight-20, 10, raylib::GRAY)
+
+		raylib::EndDrawing()
+	}
+	raylib::UnloadTexture(textAni) // Unload texture
+	raylib::UnloadImage(imgAni)
+	raylib::CloseWindow()
+}

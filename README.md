@@ -1,2 +1,9 @@
 # raylib_example
-my raylib examples 
+
+## Display gif 
+
+``` shell
+git clone https://github.com/wdvn/raylib.git ../raylib
+cd example1
+julec .
+```
