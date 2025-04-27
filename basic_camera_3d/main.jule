@@ -12,14 +12,14 @@ fn main() {
 	camera.up = raylib::Vector3{0.0, 1.0, 0.0}
 	camera.fovy = 45.0
 	camera.projection = raylib::CameraProjection.CAMERA_PERSPECTIVE
-    raylib::SetConfigFlags(raylib::ConfigFlags.FLAG_MSAA_4X_HINT)
+	raylib::SetConfigFlags(raylib::ConfigFlags.FLAG_MSAA_4X_HINT)
 	let mut cubePosition = raylib::Vector3{0.0, 1, 0}
 	let cubeSize = raylib::Vector3{2, 2, 2}
 	raylib::SetTargetFPS(60)
-	let speed:f32 = 0.1
+	let speed: f32 = 0.1
 	for !raylib::WindowShouldClose() {
 		// update cam
-		raylib::UpdateCamera(&camera,raylib::CameraMode.CAMERA_CUSTOM)
+		raylib::UpdateCamera(&camera, raylib::CameraMode.CAMERA_CUSTOM)
 
 		//
 		if (raylib::IsKeyDown(raylib::KeyboardKey.KEY_W)) {
@@ -49,7 +49,7 @@ fn main() {
 		raylib::DrawGrid(10, 1)
 		raylib::EndMode3D()
 		raylib::DrawFPS(10, 1)
-        raylib::DrawText("Moving: A,W,S,D",10,20,20,raylib::BLACK)
+		raylib::DrawText("Moving: A,W,S,D", 10, 20, 20, raylib::BLACK)
 		raylib::EndDrawing()
 	}
 
