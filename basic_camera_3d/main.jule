@@ -1,0 +1,57 @@
+#pass "-I../../raylib/include -L../../raylib/lib -lraylib -lGL -lX11 -lpthread -lm -ldl -Wl,-rpath,../../raylib/lib"
+
+use "../../raylib"
+
+fn main() {
+	let screenW = 1280
+	let screenH = 720
+	raylib::InitWindow(screenW, screenH, " 3d picking")
+	let mut camera = raylib::Camera{}
+	camera.position = raylib::Vector3{0, 10.0, 10.0}
+	camera.target = raylib::Vector3{0.0, 0.0, 0.0}
+	camera.up = raylib::Vector3{0.0, 1.0, 0.0}
+	camera.fovy = 45.0
+	camera.projection = raylib::CameraProjection.CAMERA_PERSPECTIVE
+    raylib::SetConfigFlags(raylib::ConfigFlags.FLAG_MSAA_4X_HINT)
+	let mut cubePosition = raylib::Vector3{0.0, 1, 0}
+	let cubeSize = raylib::Vector3{2, 2, 2}
+	raylib::SetTargetFPS(60)
+	let speed:f32 = 0.1
+	for !raylib::WindowShouldClose() {
+		// update cam
+		raylib::UpdateCamera(&camera,raylib::CameraMode.CAMERA_CUSTOM)
+
+		//
+		if (raylib::IsKeyDown(raylib::KeyboardKey.KEY_W)) {
+			cubePosition.z -= speed
+		}
+		if (raylib::IsKeyDown(raylib::KeyboardKey.KEY_S)) {
+			cubePosition.z += speed
+		}
+		if (raylib::IsKeyDown(raylib::KeyboardKey.KEY_A)) {
+			cubePosition.x -= speed
+		}
+		if (raylib::IsKeyDown(raylib::KeyboardKey.KEY_D)) {
+			cubePosition.x += speed
+		}
+		if (raylib::IsKeyDown(raylib::KeyboardKey.KEY_SPACE)) {
+			cubePosition.y += speed
+		}
+		if (raylib::IsKeyDown(raylib::KeyboardKey.KEY_LEFT_SHIFT)) {
+			cubePosition.y -= speed
+		}
+		raylib::BeginDrawing()
+
+		raylib::ClearBackground(raylib::RAYWHITE)
+		raylib::BeginMode3D(camera)
+		raylib::DrawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, raylib::GREEN)
+		raylib::DrawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, raylib::WHITE)
+		raylib::DrawGrid(10, 1)
+		raylib::EndMode3D()
+		raylib::DrawFPS(10, 1)
+        raylib::DrawText("Moving: A,W,S,D",10,20,20,raylib::BLACK)
+		raylib::EndDrawing()
+	}
+
+	raylib::CloseWindow()
+}

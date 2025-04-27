@@ -1,0 +1,24 @@
+#pass "-I../../raylib/include -L../../raylib/lib -lraylib -lGL -lX11 -lpthread -lm -ldl -Wl,-rpath,../../raylib/lib"
+
+use "../../raylib"
+
+static neighborhood: f32=10.0
+
+type Boid struct{
+    pos: Vector3
+    velocity: Vector3
+    tex: raylib::Texture
+}
+fn main(){
+    raylib::InitWindow(1200,690,"Basic camera 3d")
+    raylib::SetTargetFPS(60)
+    let mut camera=raylib::Camera{
+    }
+    for !raylib::WindowShouldClose(){
+        raylib::BeginDrawing()
+        raylib::ClearBackground(raylib::RAYWHITE)
+        raylib::EndDrawing()
+    
+    }
+
+}
