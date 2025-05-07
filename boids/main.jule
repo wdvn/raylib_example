@@ -1,24 +1,77 @@
 #pass "-I../../raylib/include -L../../raylib/lib -lraylib -lGL -lX11 -lpthread -lm -ldl -Wl,-rpath,../../raylib/lib"
 
+use "../../fyzer/rand"
 use "../../raylib"
+use "std/time"
 
-static neighborhood: f32=10.0
+type Vector3 = raylib::Vector3
 
-type Boid struct{
-    pos: Vector3
-    velocity: Vector3
-    tex: raylib::Texture
+struct Boid {
+	mut position: Vector3
+	mut velocity: Vector3
+	tex:          raylib::Texture
 }
-fn main(){
-    raylib::InitWindow(1200,690,"Basic camera 3d")
-    raylib::SetTargetFPS(60)
-    let mut camera=raylib::Camera{
-    }
-    for !raylib::WindowShouldClose(){
-        raylib::BeginDrawing()
-        raylib::ClearBackground(raylib::RAYWHITE)
-        raylib::EndDrawing()
-    
-    }
 
+fn randomVec3(m1: f32, m2: f32): Vector3 {
+	x := rand::Rand.RangeF32(m1, m2)
+	y := rand::Rand.RangeF32(m1, m2)
+	z := rand::Rand.RangeF32(m1, m2)
+	ret Vector3{x, y, z}
+}
+
+fn initBoids(): []&Boid {
+	let mut boids = make([]&Boid, 0, 100)
+	let mut i = 0
+	for i < 10; i++ {
+		let mut b = &Boid{
+			position: randomVec3(-20,20),
+			velocity: randomVec3(-1,1),
+		}
+		boids = append(boids, b)
+	}
+	ret boids
+}
+
+static mut delay = time::Millisecond * 300
+
+fn updateBoids(mut boids: []&Boid) {
+	time::Sleep(delay)
+	for i in boids {
+		boids[i].position = raylib::Vector3Add(boids[i].position, boids[i].velocity)
+	}
+}
+fn main() {
+	raylib::InitWindow(1200, 690, "Basic camera 3d")
+	raylib::SetTargetFPS(60)
+	let mut camera = raylib::Camera{}
+	camera.position = raylib::Vector3{0, 10.0, 20.0}
+	camera.target = raylib::Vector3{0.0, 0.0, 0.0}
+	camera.up = raylib::Vector3{0.0, 1.0, 0.0}
+	camera.fovy = 45.0
+	camera.projection = raylib::CameraProjection.CAMERA_PERSPECTIVE
+
+	//setup boids
+	mut boids := initBoids()
+	for !raylib::WindowShouldClose() {
+		raylib::UpdateCamera(&camera, raylib::CameraMode.CAMERA_CUSTOM)
+
+		if (raylib::IsKeyDown(raylib::KeyboardKey.KEY_A)) {
+			delay -= 50 * time::Millisecond
+		}
+		if (raylib::IsKeyDown(raylib::KeyboardKey.KEY_D)) {
+			delay += 50 * time::Millisecond
+		}
+
+		raylib::BeginDrawing()
+		raylib::BeginMode3D(camera)
+
+		// Boids wrap around space
+		updateBoids(boids)
+		raylib::ClearBackground(raylib::RAYWHITE)
+		for _, b in boids {
+			raylib::DrawSphere(b.position, 0.2, raylib::BLUE)
+		}
+		raylib::EndMode3D()
+		raylib::EndDrawing()
+	}
 }
