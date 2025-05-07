@@ -17,6 +17,8 @@ fn main() {
 	let cubeSize = raylib::Vector3{2, 2, 2}
 	raylib::SetTargetFPS(60)
 	let speed: f32 = 0.1
+	let mut wheel = f32(0)
+	speedZoom := f32(5)
 	for !raylib::WindowShouldClose() {
 		// update cam
 		raylib::UpdateCamera(&camera, raylib::CameraMode.CAMERA_CUSTOM)
@@ -40,6 +42,18 @@ fn main() {
 		if (raylib::IsKeyDown(raylib::KeyboardKey.KEY_LEFT_SHIFT)) {
 			cubePosition.y -= speed
 		}
+
+		wheel = f32(raylib::GetMouseWheelMove())
+		if wheel != 0 {
+			camera.fovy -= wheel * speedZoom
+			if camera.fovy < 1 {
+				camera.fovy = 1
+			}
+			if camera.fovy > 120 {
+				camera.fovy = 120
+			}
+		}
+
 		raylib::BeginDrawing()
 
 		raylib::ClearBackground(raylib::RAYWHITE)
