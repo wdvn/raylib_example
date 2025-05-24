@@ -24,8 +24,8 @@ fn initBoids(): []&Boid {
 	let mut i = 0
 	for i < 10; i++ {
 		let mut b = &Boid{
-			position: randomVec3(-20,20),
-			velocity: randomVec3(-1,1),
+			position: randomVec3(-20, 20),
+			velocity: randomVec3(-1, 1),
 		}
 		boids = append(boids, b)
 	}
@@ -52,14 +52,26 @@ fn main() {
 
 	//setup boids
 	mut boids := initBoids()
+	let mut wheel = f32(0)
 	for !raylib::WindowShouldClose() {
-		raylib::UpdateCamera(&camera, raylib::CameraMode.CAMERA_CUSTOM)
+		raylib::UpdateCamera(&camera, raylib::CameraMode.CAMERA_THIRD_PERSON)
 
 		if (raylib::IsKeyDown(raylib::KeyboardKey.KEY_A)) {
 			delay -= 50 * time::Millisecond
 		}
 		if (raylib::IsKeyDown(raylib::KeyboardKey.KEY_D)) {
 			delay += 50 * time::Millisecond
+		}
+
+		wheel = f32(raylib::GetMouseWheelMove())
+		if wheel != 0 {
+			camera.fovy -= wheel * 5
+			if camera.fovy < 1 {
+				camera.fovy = 1
+			}
+			if camera.fovy > 120 {
+				camera.fovy = 120
+			}
 		}
 
 		raylib::BeginDrawing()

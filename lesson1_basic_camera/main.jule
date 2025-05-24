@@ -18,7 +18,7 @@ fn main() {
 	raylib::SetTargetFPS(60)
 	let speed: f32 = 0.1
 	let mut wheel = f32(0)
-	speedZoom := f32(5)
+	speedZoom := f32(1.2)
 	for !raylib::WindowShouldClose() {
 		// update cam
 		raylib::UpdateCamera(&camera, raylib::CameraMode.CAMERA_CUSTOM)
