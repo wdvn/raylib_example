@@ -2,8 +2,11 @@
 
 ## Display gif 
 
+Note use jule v0.1.7
+
 ``` shell
-git clone https://github.com/wdvn/raylib.git ../raylib
-cd example1
+git https://github.com/wdvn/raylib_example.git
+git clone https://github.com/wdvn/raylib.git 
+cd raylib_example/lesson1_basic_camera
 julec .
 ```
